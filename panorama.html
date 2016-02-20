@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Here Panorama</title>
+    <style>
+        body {
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://github.com/dataarts/dat.gui/releases/download/v0.5.1/dat.gui.min.js"></script>
+    <script data-main="cube" src="js/cube.min.js"></script>
+    <script type="application/javascript">
+        // Start loading the main app file. Put all of your application logic in there.
+        requirejs(['cube'], function () {
+            var cube3D = $("#container").cube({
+                imageId: Math.floor((Math.random() * 100) + 1080363417).toString(),
+                /*
+                blurArea: {
+                    width: 10,
+                    height: 10,
+                    azimuth: 25,
+                    polar: 90,
+                    offset: 10,
+                    focus: true,
+                    static: true
+                }
+                */
+            });
+            cube3D.controller.autoRotate = true;
+            cube3D.controller.autoRotateSpeed = 0.1;
+
+            /**
+             * Create a dashboard to monitor statistics
+             * Requires: dat.gui (https://github.com/dataarts/dat.gui)
+             */
+            var createDebugGUI = function (cube3D) {
+                var gui = new dat.GUI();
+                var cameraGUI = gui.addFolder('Camera');
+                cameraGUI.add(cube3D.controller, 'autoRotate');
+                cameraGUI.add(cube3D.controller, 'autoRotateSpeed').min(0.1).max(1);
+                cameraGUI.add(cube3D.controller, 'yaw').min(-180).max(180).listen();
+                cameraGUI.add(cube3D.controller, 'pitch').min(-85).max(85).listen();
+                cameraGUI.add(cube3D.camera, 'fov')
+                    .min(cube3D.controller.minFov)
+                    .max(cube3D.controller.maxFov).listen().onChange(function () {
+                        cube3D.camera.updateProjectionMatrix();
+                    });
+                cameraGUI.open();
+
+                gui.close();
+            };
+
+            createDebugGUI(cube3D);
+        });
+    </script>
+</body>
+
+</html>
